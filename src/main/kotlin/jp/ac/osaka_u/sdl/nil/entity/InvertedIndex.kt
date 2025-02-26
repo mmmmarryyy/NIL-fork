@@ -11,12 +11,20 @@ class InvertedIndex private constructor() {
             partitionSize: Int,
             gramSize: Int,
             tokenSequences: List<TokenSequence>,
+            queryTokenSequences: List<TokenSequence>,
             startIndex: Int
         ): InvertedIndex {
             val invertedIndex = InvertedIndex()
             val endIndex = min(startIndex + partitionSize, tokenSequences.size)
             for (index in startIndex until endIndex) {
                 val nGrams = tokenSequences[index].toNgrams(gramSize)
+                nGrams.forEach {
+                    invertedIndex.hashTable.getOrPut(it) { mutableListOf() }
+                        .add(queryTokenSequences.size + index to nGrams.size)
+                }
+            }
+            for (index in queryTokenSequences.indices) {
+                val nGrams = queryTokenSequences[index].toNgrams(gramSize)
                 nGrams.forEach { invertedIndex.hashTable.getOrPut(it) { mutableListOf() }.add(index to nGrams.size) }
             }
             return invertedIndex

@@ -11,15 +11,24 @@ class OptimizedCloneDetection(
     private val filtrationBasedVerificationPhase: Filtration,
     private val verifyingPhase: Verification,
     private val tokenSequences: List<TokenSequence>,
+    private val queryTokenSequences: List<TokenSequence>,
     private val gramSize: Int
 ) : CloneDetection {
     override fun exec(id: Id): Flowable<Pair<Int, Int>> {
-        val nGrams = tokenSequences[id].toNgrams(gramSize)
+        val nGrams = queryTokenSequences[id].toNgrams(gramSize)
         return locatingPhase.locate(nGrams, id)
             .filter { filteringPhase.filter(nGrams.size, it) }
             .filter {
-                filtrationBasedVerificationPhase.filter(nGrams.size, it) ||
-                    verifyingPhase.verify(tokenSequences[id], tokenSequences[it.key.id])
+                filtrationBasedVerificationPhase.filter(nGrams.size, it) || (
+                        it.key.id >= queryTokenSequences.size &&
+                                verifyingPhase.verify(
+                                    queryTokenSequences[id],
+                                    tokenSequences[it.key.id - queryTokenSequences.size]
+                                )
+                        ) || (
+                        it.key.id < queryTokenSequences.size &&
+                                verifyingPhase.verify(queryTokenSequences[id], queryTokenSequences[it.key.id])
+                        )
             }
             .map { it.key.id }
             .map { it to id }

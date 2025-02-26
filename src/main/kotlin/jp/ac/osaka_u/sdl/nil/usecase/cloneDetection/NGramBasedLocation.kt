@@ -13,5 +13,5 @@ class NGramBasedLocation(private val invertedIndex: InvertedIndex) : Location {
             .eachCount()
             .asSequence()
             .toFlowable()
-            .filter { (nGramInfo, _) -> index > nGramInfo.id }
+            .filter { (nGramInfo, _) -> index < nGramInfo.id }
 }

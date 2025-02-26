@@ -8,14 +8,16 @@ DOI of submitted version executable file of NIL is `10.5281/zenodo.4492665`.
 NIL is a clone detector using N-gram, Inverted index, and LCS.
 NIL provides scalable large-variance clone detection.
 
+Original implementation here: https://github.com/kusumotolab/NIL
+
 ## Requirements
 
 - JDK 21+
 
 ## Install & Usage
 
-- Clone this repository (`git clone https://github.com/kusumotolab/NIL`)
-- Move into NIL's directory (`cd NIL`) and build NIL (`./gradlew ShadowJar`)
+- Clone this repository (`git clone https://github.com/mmmmarryyy/NIL-fork.git`)
+- Move into NIL's directory (`cd NIL-fork`) and build NIL (`./gradlew ShadowJar`)
 - Run NIL (`java -jar ./build/libs/NIL-all.jar [options]`)
 - Check the result file
     - If you didn't specify `-bce` option, the format is
@@ -28,6 +30,7 @@ NIL provides scalable large-variance clone detection.
 |                 Name                  | Description                                                                                            |         Default          |
 |:-------------------------------------:|:-------------------------------------------------------------------------------------------------------|:------------------------:|
 |             `-s`,`--src`              | Input source directory. You must specify the target dir.                                               |           None           |
+|          `-q`,`--query-file`          | Input query file. You must specify the target file.                                                    |           None           |
 |          `-mil`,`--min-line`          | Minimum number of lines that a code fragment must be to be treated as a clone.                         |           `6`            |
 |         `-mit`,`--min-token`          | Minimum number of tokens that a code fragment must be to be treated as a clone.                        |           `50`           |
 |            `-n`,`--n-gram`            | N for N-gram.                                                                                          |           `5`            |

@@ -29,7 +29,12 @@ class NILMain(private val config: NILConfig) {
         val startTime = System.currentTimeMillis()
         logger.infoStart()
 
-        val tokenSequences: List<TokenSequence> = PreprocessFactory.create(config).collectTokenSequences(config.src)
+        val preprocessor = PreprocessFactory.create(config)
+
+        val queryTokenSequences = preprocessor.collectTokenSequences(config.queryFile)
+        logger.infoPreprocessCompletion(queryTokenSequences.size)
+
+        val tokenSequences: List<TokenSequence> = preprocessor.collectTokenSequences(config.src, true)
         logger.infoPreprocessCompletion(tokenSequences.size)
 
         val partitionSize = (tokenSequences.size + config.partitionNum - 1) / config.partitionNum
@@ -42,7 +47,13 @@ class NILMain(private val config: NILConfig) {
                 val startIndex: Int = i * partitionSize
 
                 val invertedIndex =
-                    InvertedIndex.create(partitionSize, config.gramSize, tokenSequences, startIndex)
+                    InvertedIndex.create(
+                        partitionSize,
+                        config.gramSize,
+                        tokenSequences,
+                        queryTokenSequences,
+                        startIndex
+                    )
                 logger.infoInvertedIndexCreationCompletion(i + 1)
 
                 val locationPhase = NGramBasedLocation(invertedIndex)
@@ -53,9 +64,10 @@ class NILMain(private val config: NILConfig) {
                         filtrationBasedVerificationPhase,
                         verificationPhase,
                         tokenSequences,
+                        queryTokenSequences,
                         config.gramSize
                     )
-                Flowable.range(startIndex + 1, tokenSequences.size - startIndex - 1)
+                Flowable.range(0, queryTokenSequences.size)
                     .parallelIfSpecified(config.threads)
                     .runOn(Schedulers.computation())
                     .flatMap { cloneDetection.exec(it) }

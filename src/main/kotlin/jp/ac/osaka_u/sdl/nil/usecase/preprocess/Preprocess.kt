@@ -7,6 +7,7 @@ import jp.ac.osaka_u.sdl.nil.entity.CodeBlock
 import jp.ac.osaka_u.sdl.nil.entity.TokenSequence
 import jp.ac.osaka_u.sdl.nil.util.parallelIfSpecified
 import java.io.File
+import java.io.FileWriter
 
 /**
  * This is an abstract class for Preprocessing phase.
@@ -16,8 +17,8 @@ import java.io.File
  */
 abstract class Preprocess(private val threads: Int) {
 
-    fun collectTokenSequences(src: File): List<TokenSequence> =
-        File(CODE_BLOCK_FILE_NAME).bufferedWriter().use { bw ->
+    fun collectTokenSequences(src: File, appendLinesFlag: Boolean = false): List<TokenSequence> =
+        FileWriter(CODE_BLOCK_FILE_NAME, appendLinesFlag).use { bw ->
             collectSourceFiles(src)
                 .parallelIfSpecified(threads)
                 .runOn(Schedulers.io())

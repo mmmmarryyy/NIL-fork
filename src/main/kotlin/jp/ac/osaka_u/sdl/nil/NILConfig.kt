@@ -4,6 +4,7 @@ import java.io.File
 
 data class NILConfig(
     val src: File,
+    val queryFile: File,
     val minLine: Int = 6,
     val minToken: Int = 50,
     val gramSize: Int = 5,
@@ -19,6 +20,7 @@ data class NILConfig(
 
 fun parseArgs(args: Array<String>): NILConfig {
     var src: File? = null
+    var queryFile: File? = null
     var minLine = 6
     var minToken = 50
     var gramSize = 5
@@ -35,6 +37,7 @@ fun parseArgs(args: Array<String>): NILConfig {
     while (iterator.hasNext()) {
         when (val optionName = iterator.next().lowercase()) {
             "-s", "--src" -> src = File(iterator.next())
+            "-q", "--query-file" -> queryFile = File(iterator.next())
             "-mil", "--min-line" -> minLine = iterator.next().toIntOrException(optionName)
             "-mit", "--min-token" -> minToken = iterator.next().toIntOrException(optionName)
             "-n", "--n-gram" -> gramSize = iterator.next().toIntOrException(optionName)
@@ -56,6 +59,7 @@ fun parseArgs(args: Array<String>): NILConfig {
 
     return NILConfig(
         src ?: throw InvalidOptionException("-s must be specified."),
+        queryFile ?: throw InvalidOptionException("-q must be specified."),
         minLine,
         minToken,
         gramSize,
@@ -92,6 +96,7 @@ class InvalidOptionException(private val option: String) : RuntimeException() {
     override val message: String
         get() = """$option
             |-s, --src${'\t'}${'\t'}${'\t'}${'\t'}Source directory (must be specified)
+            |-q, --query-file${'\t'}${'\t'}${'\t'}Query file (file which clones we want to find) (must be specified)
             |-mil, --min-line${'\t'}${'\t'}${'\t'}Minimum line (default: 6)
             |-mit, --min-token${'\t'}${'\t'}${'\t'}Minimum token (default: 50)
             |-n, --n-gram${'\t'}${'\t'}${'\t'}${'\t'}N of N-gram (default: 5)
