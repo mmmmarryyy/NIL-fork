@@ -12,5 +12,7 @@ build
 clone_pairs
 code_blocks
 result_*.csv
-example_dataset
+example_java_dataset
+example_python_dataset
+example_cpp_dataset
 *.csv

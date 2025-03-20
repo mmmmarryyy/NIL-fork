@@ -22,4 +22,8 @@ class NormalLoggerWrapper(clazz: Class<*>) : LoggerWrapper {
         logger.info("End")
         logger.info("time: $time")
     }
+
+    override fun infoError(error: String) {
+        logger.info(error)
+    }
 }

@@ -1,5 +1,6 @@
 package jp.ac.osaka_u.sdl.nil
 
+import jp.ac.osaka_u.sdl.nil.QueryPreprocessor.prepareQueryFile
 import java.io.File
 
 data class NILConfig(
@@ -20,7 +21,7 @@ data class NILConfig(
 
 fun parseArgs(args: Array<String>): NILConfig {
     var src: File? = null
-    var queryFile: File? = null
+    var queryFileNull: File? = null
     var minLine = 6
     var minToken = 50
     var gramSize = 5
@@ -37,7 +38,7 @@ fun parseArgs(args: Array<String>): NILConfig {
     while (iterator.hasNext()) {
         when (val optionName = iterator.next().lowercase()) {
             "-s", "--src" -> src = File(iterator.next())
-            "-q", "--query-file" -> queryFile = File(iterator.next())
+            "-q", "--query-file" -> queryFileNull = File(iterator.next())
             "-mil", "--min-line" -> minLine = iterator.next().toIntOrException(optionName)
             "-mit", "--min-token" -> minToken = iterator.next().toIntOrException(optionName)
             "-n", "--n-gram" -> gramSize = iterator.next().toIntOrException(optionName)
@@ -57,9 +58,16 @@ fun parseArgs(args: Array<String>): NILConfig {
         throw InvalidOptionException("Cannot specify both -bce and -mif.")
     }
 
+    var queryFile = queryFileNull ?: throw InvalidOptionException("-q must be specified.")
+    if (!queryFile.isFile) {
+        throw InvalidOptionException("-q must point to a file, not a directory.")
+    } else {
+        queryFile = prepareQueryFile(queryFile, lang)
+    }
+
     return NILConfig(
         src ?: throw InvalidOptionException("-s must be specified."),
-        queryFile ?: throw InvalidOptionException("-q must be specified."),
+        queryFile,
         minLine,
         minToken,
         gramSize,
@@ -82,13 +90,14 @@ fun String.toIntOrException(optionName: String): Int =
     }
 
 fun String.toLangOrException(): Language =
+//    TODO: return other languages after preparing wrappers and test datasets for them
     when (this.lowercase()) {
         "java" -> Language.JAVA
-        "c" -> Language.C
+//        "c" -> Language.C
         "cpp" -> Language.CPP
-        "cs", "csharp" -> Language.CS
+//        "cs", "csharp" -> Language.CS
         "py", "python" -> Language.PYTHON
-        "kt", "kotlin" -> Language.KOTLIN
+//        "kt", "kotlin" -> Language.KOTLIN
         else -> throw InvalidOptionException("Language $this is invalid.")
     }
 

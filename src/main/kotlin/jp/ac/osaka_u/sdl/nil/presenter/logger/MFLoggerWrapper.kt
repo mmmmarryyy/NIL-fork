@@ -12,4 +12,5 @@ class MFLoggerWrapper(private val outputFileName: String) : LoggerWrapper {
     override fun infoCloneDetectionCompletion(partition: Int) {} /* no-op */
 
     override fun infoEnd(time: String) = print(outputFileName)
+    override fun infoError(error: String) = println(error)
 }

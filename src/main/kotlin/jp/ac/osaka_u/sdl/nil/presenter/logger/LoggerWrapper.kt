@@ -6,4 +6,5 @@ interface LoggerWrapper {
     fun infoInvertedIndexCreationCompletion(partition: Int)
     fun infoCloneDetectionCompletion(partition: Int)
     fun infoEnd(time: String)
+    fun infoError(error: String)
 }

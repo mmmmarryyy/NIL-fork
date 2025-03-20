@@ -34,6 +34,18 @@ class NILMain(private val config: NILConfig) {
         val queryTokenSequences = preprocessor.collectTokenSequences(config.queryFile)
         logger.infoPreprocessCompletion(queryTokenSequences.size)
 
+        if (queryTokenSequences.isEmpty()) {
+            logger.infoError("Error: no code block was extracted from the query file")
+            return
+        } else {
+            File(CODE_BLOCK_FILE_NAME).forEachLine { line ->
+                val parts = line.split(',')
+                val blockStartLine = parts[1]
+                val blockEndLine = parts[2]
+                println("Find block in lines $blockStartLine-$blockEndLine") // TODO: redo using logger (add info function)
+            }
+        }
+
         val tokenSequences: List<TokenSequence> = preprocessor.collectTokenSequences(config.src, true)
         logger.infoPreprocessCompletion(tokenSequences.size)
 
